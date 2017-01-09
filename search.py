@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+import copy
 
 class SearchProblem:
     """
@@ -86,20 +87,84 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+    d = {
+        'South': Directions.SOUTH,
+        'North': Directions.NORTH,
+        'East': Directions.EAST,
+        'West': Directions.WEST
+    }
+    solution = None
+    visited = set()
+    stack = util.Stack()
+    startState = problem.getStartState()
+    visited.add(startState)
+    ''' stack will hold a collection of ((x,y), [steps])'''
+    stack.push((startState, []))
+    while not stack.isEmpty() and solution == None:
+        (curState, steps) = stack.pop()
+        successors = problem.getSuccessors(curState)
+        for item in successors:
+            newState = item[0]
+            if newState in visited:
+                continue
+            visited.add(newState)
+            action = d[item[1]]
+            newSteps = copy.deepcopy(steps)
+            newSteps.append(action)
+            tup = (newState, newSteps)
+            if problem.isGoalState(newState):
+                solution = tup
+                break
+            stack.push(tup)
+    if solution == None:
+        print "We failed to find a solution"
+        return
+    return tup[1]
 
 def breadthFirstSearch(problem):
-    """Your BFS implementation goes here. Like for DFS, your 
-    search algorithm needs to return a list of actions that 
+    """Your BFS implementation goes here. Like for DFS, your
+    search algorithm needs to return a list of actions that
     reaches the goal.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+    d = {
+        'South': Directions.SOUTH,
+        'North': Directions.NORTH,
+        'East': Directions.EAST,
+        'West': Directions.WEST
+    }
+    solution = None
+    visited = set()
+    stack = util.Stack()
+    startState = problem.getStartState()
+    visited.add(startState)
+    ''' stack will hold a collection of ((x,y), [steps])'''
+    stack.push((startState, []))
+    while not stack.isEmpty() and solution == None:
+        (curState, steps) = stack.pop()
+        successors = problem.getSuccessors(curState)
+        for item in successors:
+            newState = item[0]
+            if newState in visited:
+                continue
+            visited.add(newState)
+            action = d[item[1]]
+            newSteps = copy.deepcopy(steps)
+            newSteps.append(action)
+            tup = (newState, newSteps)
+            if problem.isGoalState(newState):
+                solution = tup
+                break
+            stack.push(tup)
+    if solution == None:
+        print "We failed to find a solution"
+        return
+    return tup[1]
 
 def uniformCostSearch(problem):
-    """Your UCS implementation goes here. Like for DFS, your 
-    search algorithm needs to return a list of actions that 
+    """Your UCS implementation goes here. Like for DFS, your
+    search algorithm needs to return a list of actions that
     reaches the goal.
     """
     util.raiseNotDefined()
@@ -112,9 +177,9 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Your A* implementation goes here. Like for DFS, your 
-    search algorithm needs to return a list of actions that 
-    reaches the goal. heueristic is a heuristic function - 
+    """Your A* implementation goes here. Like for DFS, your
+    search algorithm needs to return a list of actions that
+    reaches the goal. heueristic is a heuristic function -
     you can see an example of the arguments and return type
     in "nullHeuristic", above.
     """
