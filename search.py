@@ -87,40 +87,29 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    from game import Directions
-    d = {
-        'South': Directions.SOUTH,
-        'North': Directions.NORTH,
-        'East': Directions.EAST,
-        'West': Directions.WEST
-    }
     solution = None
     visited = set()
     stack = util.Stack()
     startState = problem.getStartState()
-    visited.add(startState)
     ''' stack will hold a collection of ((x,y), [steps])'''
     stack.push((startState, []))
     while not stack.isEmpty() and solution == None:
         (curState, steps) = stack.pop()
-        successors = problem.getSuccessors(curState)
-        for item in successors:
-            newState = item[0]
-            if newState in visited:
-                continue
-            visited.add(newState)
-            action = d[item[1]]
-            newSteps = copy.deepcopy(steps)
-            newSteps.append(action)
-            tup = (newState, newSteps)
-            if problem.isGoalState(newState):
-                solution = tup
-                break
-            stack.push(tup)
+        if problem.isGoalState(curState):
+            solution = steps
+        else:
+            successors = problem.getSuccessors(curState)
+            for (newState, action, cost) in successors:
+                if newState in visited:
+                    continue
+                visited.add(newState)
+                newSteps = copy.deepcopy(steps)
+                newSteps.append(action)                
+                stack.push((newState, newSteps))
     if solution == None:
         print "We failed to find a solution"
         return
-    return tup[1]
+    return solution
 
 def breadthFirstSearch(problem):
     """Your BFS implementation goes here. Like for DFS, your
@@ -131,42 +120,8 @@ def breadthFirstSearch(problem):
     visited = set()
     queue = util.Queue()
     startState = problem.getStartState()
-    visited.add(startState)
     ''' queue will hold a collection of ((x,y), [steps])'''
     queue.push((startState, []))
-    while not queue.isEmpty() and solution == None:
-        (curState, steps) = queue.pop()
-        successors = problem.getSuccessors(curState)
-        for item in successors:
-            newState = item[0]
-            if newState in visited:
-                continue
-            visited.add(newState)
-            action = item[1]
-            newSteps = copy.deepcopy(steps)
-            newSteps.append(action)
-            tup = (newState, newSteps)
-            if problem.isGoalState(newState):
-                solution = tup
-                break
-            queue.push(tup)
-    if solution == None:
-        print "We failed to find a solution"
-        return
-    return tup[1]
-
-def uniformCostSearch(problem):
-    """Your UCS implementation goes here. Like for DFS, your
-    search algorithm needs to return a list of actions that
-    reaches the goal.
-    """
-    solution = None
-    visited = set()
-    queue = util.PriorityQueue()
-    startState = problem.getStartState()
-    visited.add(startState)
-    ''' queue will hold a collection of ((x,y), [steps]) '''
-    queue.push((startState, []), 1)
     while not queue.isEmpty() and solution == None:
         (curState, steps) = queue.pop()
         successors = problem.getSuccessors(curState)
@@ -178,13 +133,46 @@ def uniformCostSearch(problem):
             newSteps.append(action)
             tup = (newState, newSteps)
             if problem.isGoalState(newState):
-                solution = tup
+                solution = newSteps
                 break
-            queue.push(tup, cost)
+            queue.push(tup)
     if solution == None:
         print "We failed to find a solution"
         return
-    return tup[1]
+    return solution
+
+def uniformCostSearch(problem):
+    """Your UCS implementation goes here. Like for DFS, your
+    search algorithm needs to return a list of actions that
+    reaches the goal.
+    """
+    solution = None
+    ''' visited will hold state: mincost '''
+    visited = {}
+    queue = util.PriorityQueue()
+    startState = problem.getStartState()
+    visited[startState] = 0
+    ''' queue will hold a collection of (state, sumCost, [steps]) '''
+    queue.push((startState, 0, []), 1)
+    while not queue.isEmpty() and solution == None:
+        (curState, sumCost, steps) = queue.pop()
+        if problem.isGoalState(curState):
+            solution = steps
+        else:
+            successors = problem.getSuccessors(curState)
+            for (newState, action, cost) in successors:
+                newCost = sumCost + cost
+                if newState in visited and visited[newState] <= newCost:
+                    continue
+                visited[newState] = newCost
+                newSteps = copy.deepcopy(steps)
+                newSteps.append(action)
+                tup = (newState, newCost, newSteps)
+                queue.push(tup, newCost)
+    if solution == None:
+        print "We failed to find a solution"
+        return
+    return solution
 
 def nullHeuristic(state, problem=None):
     """
