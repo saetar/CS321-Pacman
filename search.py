@@ -188,8 +188,39 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     you can see an example of the arguments and return type
     in "nullHeuristic", above.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    solution = None
+    ''' visited will hold state: mincost '''
+    visited = set()
+    queue = util.PriorityQueue()
+    startState = problem.getStartState()
+    ''' queue will hold a collection of (state (n), g(n), h(n), [steps]) '''
+    initG = 0
+    initH = heuristic(startState, problem)
+    initF = initG + initH
+    queue.push((startState, initG, initH, []), initF)
+    while not queue.isEmpty() and solution == None:
+        (curState, g, h, steps) = queue.pop()
+        if problem.isGoalState(curState):
+            solution = steps
+        else:
+            if curState in visited:
+                continue
+            visited.add(curState)
+            visited.add(curState)
+            successors = problem.getSuccessors(curState)
+            for (newState, action, cost) in successors:
+                newG = g + cost
+                newH = heuristic(newState, problem)
+                newF = newG + newH
+                newSteps = copy.deepcopy(steps)
+                newSteps.append(action)
+                tup = (newState, newG, newH, newSteps)
+                queue.push(tup, newF)
+    if solution == None:
+        print "We failed to find a solution"
+        return
+    return solution
+
 
 
 # Abbreviations
