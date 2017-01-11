@@ -95,16 +95,17 @@ def depthFirstSearch(problem):
     stack.push((startState, []))
     while not stack.isEmpty() and solution == None:
         (curState, steps) = stack.pop()
+        if curState in visited:
+            continue
+        else:
+            visited.add(curState)
         if problem.isGoalState(curState):
             solution = steps
         else:
             successors = problem.getSuccessors(curState)
             for (newState, action, cost) in successors:
-                if newState in visited:
-                    continue
-                visited.add(newState)
                 newSteps = copy.deepcopy(steps)
-                newSteps.append(action)                
+                newSteps.append(action)
                 stack.push((newState, newSteps))
     if solution == None:
         print "We failed to find a solution"
@@ -131,11 +132,10 @@ def breadthFirstSearch(problem):
             visited.add(newState)
             newSteps = copy.deepcopy(steps)
             newSteps.append(action)
-            tup = (newState, newSteps)
             if problem.isGoalState(newState):
                 solution = newSteps
                 break
-            queue.push(tup)
+            queue.push((newState, newSteps))
     if solution == None:
         print "We failed to find a solution"
         return
