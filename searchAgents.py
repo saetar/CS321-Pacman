@@ -386,7 +386,7 @@ def cornersHeuristic(state, problem):
     return min([getPathCost(currentPosition, p) for p in possiblePaths])
 
 class AStarCornersAgent(SearchAgent):
-    "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
+    "A SearchAgent for FoodSearchProblem using A* and your stic"
     def __init__(self):
         self.searchFunction = lambda prob: search.aStarSearch(prob, cornersHeuristic)
         self.searchType = CornersProblem
@@ -476,8 +476,14 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-
-    return 0
+    food = foodGrid.asList()
+    if len(food) == 0:
+        return 0
+    def dist(pos1, pos2):
+        return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+    s = sorted([dist(position, pos) for pos in food])
+    f = s[0] if len(s) > 0 else 0
+    return f + len(foodGrid.asList()) - 1
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
